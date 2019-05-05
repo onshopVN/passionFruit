@@ -1,0 +1,5 @@
+twig:
+  paths:
+    '%kernel.project_dir%/src/backend/templates/backend': backend
+#    '%kernel.project_dir%/src/backend/templates/backend/%theme_admin%': backend
+  form_themes: ['bootstrap_4_horizontal_layout.html.twig']

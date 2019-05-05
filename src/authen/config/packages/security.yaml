@@ -1,0 +1,13 @@
+security:
+  firewalls:
+#    secured_area:
+#      logout:
+#        path: authen_logout
+#        target: /
+    main:
+      logout:
+        path: authen_logout
+        target: authen_login
+      guard:
+        authenticators:
+          - App\authen\security\LoginFormAuthenticator

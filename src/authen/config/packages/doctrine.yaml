@@ -1,0 +1,5 @@
+doctrine:
+    orm:
+        resolve_target_entities:
+            App\deputation\entity\AuthenEntityInterface: App\authen\entity\Authen
+#            App\deputation\repository\AuthenRepositoryInterface: App\authen\repository\AuthenRepository

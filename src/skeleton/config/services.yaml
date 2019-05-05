@@ -1,0 +1,7 @@
+services:
+    App\deputation\utils\ResultUtilsInterface:
+        class: App\skeleton\utils\ResultUtils
+
+parameters:
+    pagination.items.limit.onpage: 5
+

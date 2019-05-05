@@ -1,0 +1,11 @@
+<span class="dropdown">
+    <button id="btnSearchDrop2" type="button" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="true"
+            class="btn btn-primary dropdown-toggle dropdown-menu-right"><i
+                class="ft-settings"></i></button>
+    <span aria-labelledby="btnSearchDrop2" class="dropdown-menu mt-1 dropdown-menu-right">
+      <a href="{{ url('admin_profile_show',{'id':user.id}) }}" class="dropdown-item"><i class="ft-video-2"></i> Detail</a>
+      <a href="{{ url('admin_profile_edit',{'id':user.id}) }}" class="dropdown-item"><i class="ft-edit-2"></i> Edit</a>
+      <a href="{{ url('admin_profile_delete',{'id':user.id}) }}" class="dropdown-item"><i class="ft-trash-2"></i> Delete</a>
+    </span>
+</span>

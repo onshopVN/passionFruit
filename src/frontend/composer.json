@@ -1,0 +1,11 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "Implement frontend",
+  "type": "IQ-plugin",
+  "extra": {
+    "code": "frontend",
+    "status": "actived",
+    "priority": 80
+  }
+}

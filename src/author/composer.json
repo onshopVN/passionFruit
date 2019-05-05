@@ -1,0 +1,11 @@
+{
+  "name": "author",
+  "version": "1.0.0",
+  "description": "Implement author",
+  "type": "IQ-plugin",
+  "extra": {
+    "code": "author",
+    "status": "actived",
+    "priority": 50
+  }
+}

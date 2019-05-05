@@ -1,0 +1,4 @@
+security:
+  access_decision_manager:
+    strategy: affirmative
+    allow_if_all_abstain: false

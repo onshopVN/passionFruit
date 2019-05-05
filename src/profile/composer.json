@@ -1,0 +1,11 @@
+{
+  "name": "profile",
+  "version": "1.0.0",
+  "description": "Implement profile",
+  "type": "IQ-plugin",
+  "extra": {
+    "code": "profile",
+    "status": "actived",
+    "priority": 60
+  }
+}
