@@ -1,4 +1,5 @@
 <?php
+
 namespace App\skeleton;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -14,6 +15,7 @@ class Kernel extends BaseKernel
     const CONFIG_EXTS = '.{php,xml,yaml,yml}';
     protected $pluginDir;
     protected $projectDir;
+
     public function registerBundles()
     {
         $contents = require $this->getProjectDir() . '/config/bundles.php';
@@ -35,6 +37,7 @@ class Kernel extends BaseKernel
             }
         }
     }
+
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
         $container->addResource(new FileResource($this->getProjectDir() . '/config/bundles.php'));
@@ -57,6 +60,7 @@ class Kernel extends BaseKernel
             $loader->load($pluginConfigDir . '/{Services}_' . $this->environment . self::CONFIG_EXTS, 'glob');
         }
     }
+
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
         $confDir = $this->getProjectDir() . '/config';
@@ -72,12 +76,14 @@ class Kernel extends BaseKernel
                 $routes->import($pluginConfig . '/{Route}/' . $this->environment . '/**/*' . self::CONFIG_EXTS, '/', 'glob');
                 $routes->import($pluginConfig . '/{Route}' . self::CONFIG_EXTS, '/', 'glob');
             }
-            $pluginController = $pluginDir . '/Controller';
-            if (file_exists($pluginDir)) {
+            $pluginController = $pluginDir . '/controller';
+            if (file_exists($pluginController)) {
                 $routes->import($pluginController, '/', 'annotation');
             }
+
         }
     }
+
     /**
      * @return string The project root dir
      * Redefine because using composer.json in plugin
@@ -93,24 +99,24 @@ class Kernel extends BaseKernel
         }
         return $this->projectDir;
     }
+
     public function getPluginDir()
     {
         $this->pluginDir = $this->getProjectDir() . '/src';
         return $this->pluginDir;
     }
+
     // TODO: make cached for them
-    public function getPluginsActived(string $sort='ksort')
+    public function getPluginsActived(string $sort = 'ksort')
     {
         $pluginsDir = $this->getPluginDir();
         $plugins = array_filter(glob($pluginsDir . '/*'), 'is_dir');
         $pluginsFilter = [];
-        foreach ($plugins as $plugin)
-        {
-            $composerFile = $plugin.'/composer.json';
+        foreach ($plugins as $plugin) {
+            $composerFile = $plugin . '/composer.json';
             if (file_exists($composerFile)) {
                 $petsJson = json_decode(file_get_contents($composerFile));
-                if($petsJson->extra->status == 'actived')
-                {
+                if ($petsJson->extra->status == 'actived') {
                     $pluginsFilter[$petsJson->extra->priority] = $plugin;
                 }
             }

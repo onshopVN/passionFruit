@@ -6,4 +6,4 @@
 parameters:
 #    locale: 'en'
     theme_admin: 'modern'
-    route_admin: 'backend'
+#    route_admin: 'backend'

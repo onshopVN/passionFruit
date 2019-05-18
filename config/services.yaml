@@ -6,6 +6,7 @@
 parameters:
     locale: 'en'
     theme: 'default'
+    route_admin: 'backend'
 services:
     # default configuration for services in *this* file
     _defaults:
