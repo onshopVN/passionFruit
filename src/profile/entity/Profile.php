@@ -50,6 +50,11 @@ class Profile extends AbstractEntity //implements EntityInterface
     private $company;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $locale;
+
+    /**
      * @var \App\deputation\entity\AuthenEntityInterface
      * @ORM\OneToOne(targetEntity="App\deputation\entity\AuthenEntityInterface")
      * @ORM\JoinColumns({
@@ -111,6 +116,16 @@ class Profile extends AbstractEntity //implements EntityInterface
     public function setCompany(?string $company): self
     {
         $this->company = $company;
+        return $this;
+    }
+
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
+    public function setLocale(?string $locale): self
+    {
+        $this->locale = $locale;
         return $this;
     }
 

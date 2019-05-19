@@ -19,9 +19,9 @@ class AuthenAdmController extends AdmController
      * @param RequestStack $requestStack
      * @param AuthenRepository $objectRepository
      */
-    public function __construct( AuthenRepository $objectRepository)
+    public function __construct( AuthenRepository $objectRepository, SessionInterface $session)
     {
-        parent::__construct( $objectRepository );
+        parent::__construct($objectRepository, $session);
     }
 
     /**
