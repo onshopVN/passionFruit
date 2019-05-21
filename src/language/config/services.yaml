@@ -1,0 +1,7 @@
+services:
+# https://symfony.com/doc/current/doctrine/event_listeners_subscribers.html
+#  https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/events.html
+  App\language\subscriber\DoctrineSubscriber:
+    arguments: ['@session']
+    tags:
+      - { name: doctrine.event_subscriber, connection: default }

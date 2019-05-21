@@ -26,12 +26,23 @@ class Authen implements EntityInterface, UserInterface
     }
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @ORM\Column(type="string", length=180, unique=true, name="email", options={"lang":"multi"})
      */
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=180)
+     */
+    private $email_en;
+
+    /**
+     * @ORM\Column(type="string", length=180)
+     */
+    private $email_vi;
+
+
+    /**
+     * @ORM\Column(type="string", length=255, columnDefinition="")
      */
     private $username;
 
@@ -153,6 +164,20 @@ class Authen implements EntityInterface, UserInterface
     public function setProfile($profile = null): self
     {
         $this->profile = $profile;
+        return $this;
+    }
+
+    public function getLanguage($field, $lang)
+    {
+        $new_field = $field.'_'.$lang;
+        return $this->$new_field;
+    }
+
+    public function setLanguage($field, $lang, $value):self
+    {
+        $new_field = $field.'_'.$lang;
+
+        $this->$new_field = $value;
         return $this;
     }
 }
