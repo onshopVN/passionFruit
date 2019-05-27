@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class DoctrineSubscriber implements EventSubscriber
 {
     private $session;
+    private $language = 'en';
 
     /**
      * DoctrineSubscriber constructor.
@@ -56,11 +57,11 @@ class DoctrineSubscriber implements EventSubscriber
 //                Authen::class
 //            );
             $doc = $reader->getPropertyAnnotations($test1);
-
+            $this->language = $this->session->get('_locale')?$this->session->get('_locale'):'en';
             if( isset($doc[0]->options['lang']))
             {
                 $test1->setAccessible(true);
-                $test1->setValue($object, $object->getLanguage('email',$this->session->get('_locale')));
+                $test1->setValue($object, $object->getLanguage('email',$this->language));
             }
         }
 
@@ -86,9 +87,10 @@ class DoctrineSubscriber implements EventSubscriber
             if( isset($doc[0]->options['lang']))
             {
                 $test2 = $test->getProperty('email_'.$this->session->get('_locale'));
+                $this->language = $this->session->get('_locale')?$this->session->get('_locale'):'en';
                 $test1->setAccessible(true);
                 $test2->setAccessible(true);
-                $object->setLanguage('email',$this->session->get('_locale'), $test1->getValue($object));
+                $object->setLanguage('email',$this->language, $test1->getValue($object));
 //                dump($test1->getValue($object));
 //                dump($test2);die;
 

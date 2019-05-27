@@ -2,8 +2,9 @@
 
 namespace App\authen\entity;
 
-use App\deputation\entity\EntityInterface;
 use App\deputation\entity\ProfileEntityInterface;
+use App\language\entity\AuthenTrait;
+use App\skeleton\entity\AbstractEntity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -11,8 +12,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass="App\authen\repository\AuthenRepository")
  */
-class Authen implements EntityInterface, UserInterface
+class Authen extends AbstractEntity  implements UserInterface
 {
+    use AuthenTrait;
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -29,17 +31,6 @@ class Authen implements EntityInterface, UserInterface
      * @ORM\Column(type="string", length=180, unique=true, name="email", options={"lang":"multi"})
      */
     private $email;
-
-    /**
-     * @ORM\Column(type="string", length=180)
-     */
-    private $email_en;
-
-    /**
-     * @ORM\Column(type="string", length=180)
-     */
-    private $email_vi;
-
 
     /**
      * @ORM\Column(type="string", length=255, columnDefinition="")
@@ -167,17 +158,4 @@ class Authen implements EntityInterface, UserInterface
         return $this;
     }
 
-    public function getLanguage($field, $lang)
-    {
-        $new_field = $field.'_'.$lang;
-        return $this->$new_field;
-    }
-
-    public function setLanguage($field, $lang, $value):self
-    {
-        $new_field = $field.'_'.$lang;
-
-        $this->$new_field = $value;
-        return $this;
-    }
 }
