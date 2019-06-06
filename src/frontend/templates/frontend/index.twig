@@ -1,22 +1,22 @@
-{% extends 'frontend/base.twig' %}
+{% extends '@frontend/frontend/base.twig' %}
 
 {% block title %}Hello PageController!{% endblock %}
 
 {% block body %}
 
     <!-- Navigation -->
-    {{ include('frontend/navigation.twig',{}) }}
+    {{ include('@frontend/frontend/navigation.twig',{}) }}
 
     <!-- Header -->
-    {{ include('frontend/header.twig',{}) }}
+    {{ include('@frontend/frontend/header.twig',{}) }}
 
 
     <!-- Services -->
-    {{ include('frontend/service.twig',{}) }}
+    {{ include('@frontend/frontend/service.twig',{}) }}
 
 
     <!-- features Grid -->
-    {{ include('frontend/features.twig',{}) }}
+    {{ include('@frontend/frontend/features.twig',{}) }}
 
 
     <!-- About -->

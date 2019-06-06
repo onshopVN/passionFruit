@@ -8,6 +8,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
+use App\skeleton\di\PluginPass;
 
 class Kernel extends BaseKernel
 {
@@ -59,6 +60,7 @@ class Kernel extends BaseKernel
             $loader->load($pluginConfigDir . '/{Services}' . self::CONFIG_EXTS, 'glob');
             $loader->load($pluginConfigDir . '/{Services}_' . $this->environment . self::CONFIG_EXTS, 'glob');
         }
+        $container->setParameter('skeleton.activated_plugins', $plugins);
     }
 
     protected function configureRoutes(RouteCollectionBuilder $routes)
@@ -123,5 +125,17 @@ class Kernel extends BaseKernel
         }
         $sort($pluginsFilter);
         return $pluginsFilter;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param ContainerBuilder $container
+     */
+    protected function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new PluginPass());
     }
 }

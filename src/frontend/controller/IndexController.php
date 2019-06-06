@@ -14,7 +14,7 @@ class IndexController extends InxController
      */
     public function index()
     {
-        return $this->render('frontend/index.twig', []);
+        return $this->render('@frontend/frontend/index.twig', []);
     }
 
 }
