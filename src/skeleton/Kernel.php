@@ -54,10 +54,10 @@ class Kernel extends BaseKernel
             $bundles = $pluginConfigDir . '/bundles.php';
             if (file_exists($bundles))
                 $container->addResource(new FileResource($bundles));
-            $loader->load($pluginConfigDir . '/{Packages}/*' . self::CONFIG_EXTS, 'glob');
-            $loader->load($pluginConfigDir . '/{Packages}/' . $this->environment . '/**/*' . self::CONFIG_EXTS, 'glob');
-            $loader->load($pluginConfigDir . '/{Services}' . self::CONFIG_EXTS, 'glob');
-            $loader->load($pluginConfigDir . '/{Services}_' . $this->environment . self::CONFIG_EXTS, 'glob');
+            $loader->load($pluginConfigDir . '/{packages}/*' . self::CONFIG_EXTS, 'glob');
+            $loader->load($pluginConfigDir . '/{packages}/' . $this->environment . '/**/*' . self::CONFIG_EXTS, 'glob');
+            $loader->load($pluginConfigDir . '/{services}' . self::CONFIG_EXTS, 'glob');
+            $loader->load($pluginConfigDir . '/{services}_' . $this->environment . self::CONFIG_EXTS, 'glob');
         }
     }
 
