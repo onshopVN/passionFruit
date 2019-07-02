@@ -42,9 +42,9 @@ class AuthenRepository extends SkeletonRepository implements AuthenRepositoryInt
             ->addSelect('a');
         if ($term->getUsername()) {
             $name  = $term->getUsername();
-            $qb->orWhere('a.username LIKE :username')
-                ->orWhere('a.email LIKE :email')
-                ->setParameter('username', '%'.$name.'%')
+//            $qb->orWhere('a.username LIKE :username')
+//                ->setParameter('username', '%'.$name.'%')
+            $qb->orWhere('a.email_en LIKE :email')
                 ->setParameter('email', '%'.$name.'%')
             ;
         }

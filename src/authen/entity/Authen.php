@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass="App\authen\repository\AuthenRepository")
  */
-class Authen extends AbstractEntity  implements UserInterface
+class Authen  extends AbstractEntity implements UserInterface
 {
     use AuthenTrait;
     /**
@@ -28,7 +28,7 @@ class Authen extends AbstractEntity  implements UserInterface
     }
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true, name="email", options={"lang":"multi"})
+     * @ORM\Column(type="string", length=180, unique=true, name="email")
      */
     private $email;
 
@@ -36,6 +36,12 @@ class Authen extends AbstractEntity  implements UserInterface
      * @ORM\Column(type="string", length=255, columnDefinition="")
      */
     private $username;
+
+
+    /**
+     * @ORM\Column(type="string", length=255, columnDefinition="")
+     */
+    private $fullname;
 
     /**
      * @ORM\Column(type="json", nullable=true)
@@ -85,6 +91,22 @@ class Authen extends AbstractEntity  implements UserInterface
     public function setUsername(?string $username): self
     {
         $this->username = $username;
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getFullname(): string
+    {
+        return (string)$this->fullname;
+    }
+
+    public function setFullname(?string $fullname): self
+    {
+        $this->fullname = $fullname;
         return $this;
     }
 

@@ -1,12 +1,13 @@
 <?php
+
 namespace App\language\subscriber;
 
-use App\authen\entity\Authen;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventArgs;
 use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -15,6 +16,7 @@ class DoctrineSubscriber implements EventSubscriber
 {
     private $session;
     private $language = 'en';
+    private $seperateChar = '_';
 
     /**
      * DoctrineSubscriber constructor.
@@ -25,114 +27,40 @@ class DoctrineSubscriber implements EventSubscriber
         $this->session = $session;
     }
 
-    public function loadClassMetadata(EventArgs $eventArgs)
-    {
-//        $ea = $this->getEventAdapter($eventArgs);
-//        $this->loadMetadataForObjectClass($ea->getObjectManager(), $eventArgs->getClassMetadata());
-    }
-
-//    public function onKernelRequest(GetResponseEvent $event)
-//    {
-//        $request = $event->getRequest();
-//        if (!$request->hasPreviousSession()) {
-//            return;
-//        }
-//        // if no explicit locale has been set on this request, use one from the session
-//        $request->setLocale($request->getSession()->get('_locale', $this->defaultLocale));
-//    }
-
     public function postLoad(LifecycleEventArgs $args)
     {
+        dump('postLoad');
         $om = $args->getObjectManager();
         $object = $args->getObject();
-        $meta = $om->getClassMetadata(get_class($object));
+        $classMetadata = $om->getClassMetadata(get_class($object));
 
-        $test = $meta->getReflectionClass();
-        if($test->hasProperty('email'))
-        {
-            $test1 = $test->getProperty('email');
-            $reader = new AnnotationReader();
-//            $doc = $reader->getPropertyAnnotation(
-//                $test1,
-//                Authen::class
-//            );
-            $doc = $reader->getPropertyAnnotations($test1);
-            $this->language = $this->session->get('_locale')?$this->session->get('_locale'):'en';
-            if( isset($doc[0]->options['lang']))
-            {
-                $test1->setAccessible(true);
-                $test1->setValue($object, $object->getLanguage('email',$this->language));
-            }
-        }
-
+        $reflectionClass = $classMetadata->getReflectionClass();
+        $this->changeValueTranslatableFields($object, $reflectionClass);
     }
 
     public function prePersist(LifecycleEventArgs $args)
     {
+        dump('prePersist');
         $om = $args->getObjectManager();
         $object = $args->getObject();
-        $meta = $om->getClassMetadata(get_class($object));
+        $classMetadata = $om->getClassMetadata(get_class($object));
 
-        $test = $meta->getReflectionClass();
-        if($test->hasProperty('email'))
-        {
-            $test1 = $test->getProperty('email');
-            $reader = new AnnotationReader();
-//            $doc = $reader->getPropertyAnnotation(
-//                $test1,
-//                Authen::class
-//            );
-            $doc = $reader->getPropertyAnnotations($test1);
-
-            if( isset($doc[0]->options['lang']))
-            {
-                $test2 = $test->getProperty('email_'.$this->session->get('_locale'));
-                $this->language = $this->session->get('_locale')?$this->session->get('_locale'):'en';
-                $test1->setAccessible(true);
-                $test2->setAccessible(true);
-                $object->setLanguage('email',$this->language, $test1->getValue($object));
-//                dump($test1->getValue($object));
-//                dump($test2);die;
-
-            }
-        }
-
+        $reflectionClass = $classMetadata->getReflectionClass();
+        $this->changeValueTranslatableFields($object, $reflectionClass, false);
     }
-
 
     public function preUpdate(LifecycleEventArgs $args)
     {
+        dump('preUpdate');
         $om = $args->getObjectManager();
         $object = $args->getObject();
-        $meta = $om->getClassMetadata(get_class($object));
+        $classMetadata = $om->getClassMetadata(get_class($object));
 
-        $test = $meta->getReflectionClass();
-        if($test->hasProperty('email'))
-        {
-            $test1 = $test->getProperty('email');
-            $reader = new AnnotationReader();
-//            $doc = $reader->getPropertyAnnotation(
-//                $test1,
-//                Authen::class
-//            );
-            $doc = $reader->getPropertyAnnotations($test1);
-
-            if( isset($doc[0]->options['lang']))
-            {
-                $test2 = $test->getProperty('email_'.$this->session->get('_locale'));
-                $test1->setAccessible(true);
-                $test2->setAccessible(true);
-                $object->setLanguage('email',$this->session->get('_locale'), $test1->getValue($object));
-//                dump($test1->getValue($object));
-//                dump($test2);die;
-
-            }
-        }
-
+        $reflectionClass = $classMetadata->getReflectionClass();
+        $this->changeValueTranslatableFields($object, $reflectionClass, false);
     }
 
-
-    public  function getSubscribedEvents()
+    public function getSubscribedEvents()
     {
         return [
             // must be registered before (i.e. with a higher priority than) the default Locale listener
@@ -141,31 +69,56 @@ class DoctrineSubscriber implements EventSubscriber
 //            Events::postPersist,
             Events::preUpdate,
 //            'onFlush',
-            Events::loadClassMetadata
+//            Events::loadClassMetadata
         ];
     }
 
-
-    // get field translatable
-    public function getTranslatableLocale($object, $meta, $om = null)
+    public function getTranslatableFields($reflectionClass)
     {
-        $locale = $this->locale;
-//        if (isset(self::$configurations[$this->name][$meta->name]['locale'])) {
-            /** @var \ReflectionClass $class */
-            $class = $meta->getReflectionClass();
-        dump($class->getMethods()); die;
-            $reflectionProperty = $class->getProperty('email');
-            $reflectionProperty->setAccessible(true);
-            $value = $reflectionProperty->getValue($object);
-        dump($value); die;
-            if (is_object($value) && method_exists($value, '__toString')) {
-                $value = (string) $value;
+        $properties = $reflectionClass->getProperties();
+        $propertiesLanguage = [];
+        foreach ($properties as $property) {
+            $reader = new AnnotationReader();
+            $doc = $reader->getPropertyAnnotations($property);
+            if (isset($doc[0]->options['translate'])) {
+                $propertiesLanguage[$doc[0]->options['translate']] = $property->name;
             }
-            if ($this->isValidLocale($value)) {
-                $locale = $value;
-            }
-//        }
-        return $locale;
+        }
+        return $propertiesLanguage;
     }
 
+    public function getTranslatableField($reflectionClass, $fieldName)
+    {
+        $fieldLang = $fieldName . $this->seperateChar . $this->getCurrentLanguage();
+        if ($reflectionClass->hasProperty($fieldLang))
+            return $fieldLang;
+        return false;
+    }
+
+    public function changeValueTranslatableFields($object, $reflectionClass, $postLoad = 'true')
+    {
+        $langProperties = $this->getTranslatableFields($reflectionClass);
+
+        foreach ($langProperties as $key => $value) {
+            $keyLang = $this->getTranslatableField($reflectionClass, $key);
+            if ($keyLang) {
+                $property = $reflectionClass->getProperty($key);
+                $property->setAccessible(true);
+
+                if ($postLoad) {
+                    $property->setValue($object, $object->getLanguage($key, $this->getCurrentLanguage()));
+                } else {
+                    $propertyLang = $reflectionClass->getProperty($keyLang);
+                    $propertyLang->setAccessible(true);
+                    $object->setLanguage($key, $this->getCurrentLanguage(), $property->getValue($object));
+                }
+            }
+        }
+    }
+
+    public function getCurrentLanguage()
+    {
+        $this->language = $this->session->get('_locale') ? $this->session->get('_locale') : 'en';
+        return $this->language;
+    }
 }
