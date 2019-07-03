@@ -2,8 +2,9 @@
 
 namespace App\authen\entity;
 
-use App\deputation\entity\EntityInterface;
 use App\deputation\entity\ProfileEntityInterface;
+use App\language\entity\AuthenTrait;
+use App\skeleton\entity\AbstractEntity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -11,8 +12,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass="App\authen\repository\AuthenRepository")
  */
-class Authen implements EntityInterface, UserInterface
+class Authen  extends AbstractEntity implements UserInterface
 {
+    use AuthenTrait;
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -26,14 +28,20 @@ class Authen implements EntityInterface, UserInterface
     }
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @ORM\Column(type="string", length=180, unique=true, name="email")
      */
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, columnDefinition="")
      */
     private $username;
+
+
+    /**
+     * @ORM\Column(type="string", length=255, columnDefinition="")
+     */
+    private $fullname;
 
     /**
      * @ORM\Column(type="json", nullable=true)
@@ -83,6 +91,22 @@ class Authen implements EntityInterface, UserInterface
     public function setUsername(?string $username): self
     {
         $this->username = $username;
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getFullname(): string
+    {
+        return (string)$this->fullname;
+    }
+
+    public function setFullname(?string $fullname): self
+    {
+        $this->fullname = $fullname;
         return $this;
     }
 
@@ -155,4 +179,5 @@ class Authen implements EntityInterface, UserInterface
         $this->profile = $profile;
         return $this;
     }
+
 }

@@ -21,6 +21,7 @@ class AuthenType extends AbstractType
         $builder
             ->add('email', EmailType::class, ['required' => false, 'constraints' => [new NotBlank(['groups' => ['create', 'update', 'login']])]])
             ->add('username', TextType::class, ['required' => false, 'constraints' => [new NotBlank(['groups' => ['create', 'update']])]])
+            ->add('fullname', TextType::class, ['required' => false, 'constraints' => [new NotBlank(['groups' => ['create', 'update']])]])
             ->add('password', PasswordType::class, ['required' => false, 'constraints' => [new NotBlank(['groups' => ['update', 'login']])]])
             ->add('profile', EntityType::class, [
                 'class' => Profile::class,

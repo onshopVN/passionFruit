@@ -1,0 +1,11 @@
+{
+  "name": "language",
+  "version": "1.0.0",
+  "description": "Implement multi language",
+  "type": "IQ-plugin",
+  "extra": {
+    "code": "language",
+    "status": "actived",
+    "priority": 99
+  }
+}
