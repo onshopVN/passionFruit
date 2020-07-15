@@ -1,4 +1,0 @@
-doctrine:
-    orm:
-        resolve_target_entities:
-            App\deputation\entity\ProfileEntityInterface: App\profile\entity\Profile

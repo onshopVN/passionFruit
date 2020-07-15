@@ -1,3 +1,0 @@
-framework:
-    translator:
-        path: '%kernel.project_dir%/src/authen/translations'

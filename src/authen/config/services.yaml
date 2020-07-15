@@ -1,5 +1,0 @@
-#services:
-#    App\deputation\repository\AuthenRepositoryInterface:
-#        class: App\authen\repository\AuthenRepository
-#    App\deputation\entity\AuthenEntityInterface:
-#        class: App\authen\entity\Authen

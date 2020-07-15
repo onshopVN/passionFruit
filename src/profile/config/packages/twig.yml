@@ -1,4 +1,0 @@
-twig:
-  paths:
-    '%kernel.project_dir%/src/profile/templates': ~
-    '%kernel.project_dir%/src/profile/templates/backend': backend

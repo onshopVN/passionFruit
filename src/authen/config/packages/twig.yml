@@ -1,4 +1,0 @@
-twig:
-  paths:
-    '%kernel.project_dir%/src/authen/templates': ~
-    '%kernel.project_dir%/src/authen/templates/backend': backend
