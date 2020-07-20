@@ -20,6 +20,5 @@
 ###< symfony/phpunit-bridge ###
 
 ###> app/core ###
-/config/services/plugins.yaml
-/config/routes/plugins.yaml
+/app/
 ###< app/core ###

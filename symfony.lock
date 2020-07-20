@@ -84,8 +84,14 @@
     "monolog/monolog": {
         "version": "2.x-dev"
     },
+    "nikic/php-parser": {
+        "version": "v4.6.0"
+    },
     "ocramius/proxy-manager": {
         "version": "2.2.3"
+    },
+    "php": {
+        "version": "7.4"
     },
     "phpdocumentor/reflection-common": {
         "version": "2.x-dev"
@@ -104,6 +110,9 @@
     },
     "psr/event-dispatcher": {
         "version": "1.0.x-dev"
+    },
+    "psr/link": {
+        "version": "1.0.0"
     },
     "psr/log": {
         "version": "1.1.x-dev"
@@ -241,6 +250,9 @@
     "symfony/http-kernel": {
         "version": "5.2-dev"
     },
+    "symfony/inflector": {
+        "version": "v5.1.2"
+    },
     "symfony/intl": {
         "version": "5.2-dev"
     },
@@ -255,6 +267,15 @@
         "files": [
             "config/packages/mailer.yaml"
         ]
+    },
+    "symfony/maker-bundle": {
+        "version": "1.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "1.0",
+            "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
+        }
     },
     "symfony/mime": {
         "version": "5.2-dev"
@@ -275,6 +296,18 @@
             "config/packages/prod/deprecations.yaml",
             "config/packages/prod/monolog.yaml",
             "config/packages/test/monolog.yaml"
+        ]
+    },
+    "symfony/notifier": {
+        "version": "5.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "5.0",
+            "ref": "c31585e252b32fe0e1f30b1f256af553f4a06eb9"
+        },
+        "files": [
+            "config/packages/notifier.yaml"
         ]
     },
     "symfony/orm-pack": {
@@ -315,6 +348,9 @@
     },
     "symfony/polyfill-php80": {
         "version": "1.17-dev"
+    },
+    "symfony/process": {
+        "version": "v5.1.2"
     },
     "symfony/profiler-pack": {
         "version": "dev-master"
@@ -435,6 +471,9 @@
     },
     "symfony/var-exporter": {
         "version": "5.2-dev"
+    },
+    "symfony/web-link": {
+        "version": "v5.1.2"
     },
     "symfony/web-profiler-bundle": {
         "version": "3.3",
