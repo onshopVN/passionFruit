@@ -1,0 +1,20 @@
+imports:
+    - { resource: '../../src/Core/{Resource}/{config}/*.yaml' }
+parameters:
+    app.plugins: 
+        - Core
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true 
+    App\Core\:
+        resource: '../../src/Core/*'
+        exclude: '../../src/Core/{Resource,Deputation,DependencyInjection,Entity,Migrations,Tests,Kernel.php}'    
+doctrine:
+    orm:
+        mappings:
+            App\Core:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Core/Entity'
+                prefix: 'App\Core\Entity'

@@ -1,0 +1,5 @@
+services:
+    App\Core\Subscriber\DoctrineSubscriber:
+        autowire: true
+        tags: 
+            - { name: 'doctrine.event_subscriber' }

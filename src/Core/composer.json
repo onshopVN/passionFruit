@@ -1,0 +1,10 @@
+{
+    "name": "core",
+    "version": "1.0.0",
+    "description": "Implement core",
+    "type": "IQ-plugin",
+    "extra": {
+      "code": "Core",
+      "priority": 20
+    }
+  }

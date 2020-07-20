@@ -1,0 +1,10 @@
+{
+    "name": "skeleton",
+    "version": "1.0.0",
+    "description": "Implement skeleton",
+    "type": "IQ-plugin",
+    "extra": {
+      "code": "Skeleton",
+      "priority": 0
+    }
+  }
