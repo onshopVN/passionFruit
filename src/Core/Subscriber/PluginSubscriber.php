@@ -43,12 +43,12 @@ class PluginSubscriber implements EventSubscriberInterface
             if ($plugin->isEnable()) {
                 // dump config 
                 // route
-                $this->pluginR->applyConfigAndRoutes();
+                $this->pluginR->applyWorkflow();
             }
             if ($plugin->isDisable()) {
                 // dump config
                 // route 
-                $this->pluginR->applyConfigAndRoutes();
+                $this->pluginR->applyWorkflow();
             }
         }
     }

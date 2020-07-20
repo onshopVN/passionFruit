@@ -12,6 +12,6 @@ class IndexController extends AbstractController
      */
     public function index(Request $request)
     {
-        return $this->json(['It works']);
+        return $this->render('Core/index.twig');
     }
 }

@@ -490,6 +490,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * @param integer $flush
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @return $this
      */
     public function save($entity)
     {
@@ -523,6 +524,18 @@ abstract class AbstractRepository extends ServiceEntityRepository
             $this->eventDispatcher->dispatch($updateEvent, $updateEvent->getName());
         }
 
-        return $em;
+        return $this;
+    }
+
+    /**
+     * Delete an entity
+     * @return $this
+     */
+    public function delete($entity)
+    {
+        $em = $this->getEntityManager();
+        $em->remove($entity);
+        $em->flush();
+        return $this;
     }
 }
