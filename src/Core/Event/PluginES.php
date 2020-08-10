@@ -1,12 +1,12 @@
 <?php 
-namespace App\Core\Subscriber;
+namespace App\Core\Event;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use App\Core\Event\EntityAfterUpdateEvent;
 use App\Core\Entity\Plugin;
 use App\Core\Repository\PluginRepository;
 
-class PluginSubscriber implements EventSubscriberInterface
+class PluginES implements EventSubscriberInterface
 {
     /**
      * @var PluginRepository
@@ -37,17 +37,13 @@ class PluginSubscriber implements EventSubscriberInterface
      */
     public function onPluginUpdate(EntityAfterUpdateEvent $event)
     {
-        if ($event->hasChangeField('status')) {
+        if ($event->hasUpdate('status')) {
             /** @var Plugin $plugin */
             $plugin = $event->getEntity();
             if ($plugin->isEnable()) {
-                // dump config 
-                // route
                 $this->pluginR->applyWorkflow();
             }
             if ($plugin->isDisable()) {
-                // dump config
-                // route 
                 $this->pluginR->applyWorkflow();
             }
         }

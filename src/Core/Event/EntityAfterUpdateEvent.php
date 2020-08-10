@@ -3,40 +3,30 @@ namespace App\Core\Event;
 
 class EntityAfterUpdateEvent extends EntityEvent
 {
-    protected $oldEntity;
+    /**
+     * Hold update values
+     * @var array 
+     */
+    protected $updates = [];
 
     /**
-     * Get $oldEntity
-     * @return mix
+     * Get $updates
+     * 
+     * @return array 
      */
-    public function getOldEntity()
+    public function getUpdates() : array 
     {
-        return $this->oldEntity;
+        return $this->updates;
     }
 
     /**
-     * Set $oldEntity
-     * @param $oldEntity
+     * Set $updates
+     * @param array $updates
      * @return $this 
      */
-    public function setOldEntity($oldEntity)
+    public function setUpdates(array $updates) : self
     {
-        $this->oldEntity = $oldEntity;
-        return $this;
-    }
-
-    /**
-     * Set $entity
-     * @return $this 
-     */
-    public function setEntity($entity)
-    {
-        parent::setEntity($entity);
-
-        if (!$this->getOldEntity()) {
-            $oldEntity = clone $this->getEntity();
-            $this->setOldEntity($oldEntity);
-        }
+        $this->updates = $updates;
         return $this;
     }
 
@@ -50,17 +40,21 @@ class EntityAfterUpdateEvent extends EntityEvent
     }
 
     /**
-     * Check value different between oldstate and current entity 
+     * Check value has updated or not
      * @param string name 
      * @return bool 
      */
-    public function hasChangeField(string $name) : bool
+    public function hasUpdate(string $name) : bool
     {
-        $method = 'get' . ucfirst($name);
-        if (!method_exists($this->getEntity(), $method) || !method_exists($this->getOldEntity(), $method)) {
-            return false;
-        }
+        return array_key_exists($name, $this->getUpdates());
+    }
 
-        return $this->getEntity()->$method() != $this->getOldEntity()->$method();
+    /**
+     * Get update value
+     * @return mixed
+     */
+    public function getUpdate(string $name)
+    {
+        return $this->updates[$name];
     }
 }
