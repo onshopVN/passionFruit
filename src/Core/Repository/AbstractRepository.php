@@ -14,9 +14,10 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 abstract class AbstractRepository extends ServiceEntityRepository
 {
     /**
+     * Hold the updates of property during copyValues function
      * @var array 
      */
-    protected $snapshot = [];
+    protected $updates = [];
 
     /**
      * @var ParameterBagInterface
@@ -156,7 +157,10 @@ abstract class AbstractRepository extends ServiceEntityRepository
                         $aPath .= $filename;
                         $this->filesystem->dumpFile($aPath, base64_decode($image64));
                         $value = '/' . $path . $filename;
-                    }       
+                    }
+                    
+                    // track updates value of property, used for update entity event
+                    $this->trackUpdate($entity, $name);
                     $entity->{$setMethod}($value);
                 }
             } catch (MappingException $e) {
@@ -473,14 +477,22 @@ abstract class AbstractRepository extends ServiceEntityRepository
     }
 
     /**
-     * Snapshot an entity
-     * @param $entity 
+     * Track update an entity
+     * @param $entity
+     * @return $this
      */
-    public function snapshot($entity)
+    public function trackUpdate($entity, $property) : self 
     {
-        if ($entity->getId()) {
-            $this->snapshots[$entity->getId()] = clone $entity;
+        if (method_exists($entity, 'getId') && $entity->getId() > 0) { // only track entity which is id > 0
+            if (!isset($this->updates[$entity->getId()]) || !array_key_exists($property, $this->updates[$entity->getId()])) { // only track first value
+                $method = 'get' . ucfirst($property);
+                if (method_exists($entity, $method)) {
+                    $this->updates[$entity->getId()][$property] = $entity->$method();   
+                }
+            }
         }
+
+        return $this;
     }
 
     /**
@@ -497,8 +509,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
         // handle entity event 
         if (!$entity->getId()) {
             $createEvent = new EntityAfterCreateEvent($entity);
-        } else if (isset($this->snapshots[$entity->getId()])) {
-            $updateEvent = new EntityAfterUpdateEvent($this->snapshots[$entity->getId()]);
+        } else if (isset($this->updates[$entity->getId()])) {
+            $updateEvent = new EntityAfterUpdateEvent($entity);
+            $updateEvent->setUpdates($this->updates[$entity->getId()]);
         }
 
         $em = $this->getEntityManager();
@@ -522,6 +535,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
         if (isset($updateEvent)) {
             $updateEvent->setEntity($entity);
             $this->eventDispatcher->dispatch($updateEvent, $updateEvent->getName());
+            unset($this->updates[$entity->getId()]);
         }
 
         return $this;

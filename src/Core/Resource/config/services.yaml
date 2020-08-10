@@ -1,6 +1,0 @@
-services:
-    App\Core\Subscriber\DoctrineSubscriber:
-        autowire: true
-        autoconfigure: true
-        tags: 
-            - { name: 'doctrine.event_subscriber' }
