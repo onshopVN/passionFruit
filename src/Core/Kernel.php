@@ -4,6 +4,7 @@ namespace App\Core;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -64,7 +65,6 @@ class Kernel extends \Symfony\Component\HttpKernel\Kernel
 
         // for plugins
         $plugins = $this->getPlugins();
-        uasort($plugins, fn($p1,$p2) => $p1['priority'] > $p2['priority']); // sort by priority
         foreach ($plugins as $plugin) {
             // config
             $config = $plugin['path'].'/Resource/config';
@@ -127,7 +127,6 @@ class Kernel extends \Symfony\Component\HttpKernel\Kernel
         }
 
         $plugins = $this->getPlugins();
-        uasort($plugins, fn($p1,$p2) => $p1['priority'] > $p2['priority']); // sort by priority
         foreach ($plugins as $plugin) {
             $dir = $plugin['path'].'/Controller';
             if (is_dir($dir)) {
@@ -145,19 +144,33 @@ class Kernel extends \Symfony\Component\HttpKernel\Kernel
     {
         if (null === $this->plugins) {
             $this->plugins = [];
-            $dir = $this->projectDir . '/app';
-            $nodes = array_filter(glob($dir . '/*'), 'is_dir');
-            foreach ($nodes as $node) {
-                $composer = $node.'/composer.json';
-                if (is_file($composer)) {
-                    $plugin = json_decode(file_get_contents($composer), true);
-                    if (isset($plugin['extra'])) {
-                        $this->plugins[$plugin['extra']['code']] = [
-                            'code' => $plugin['extra']['code'],
-                            'priority' => $plugin['extra']['priority'],
-                            'path' => $dir.'/'.$plugin['extra']['code']
+
+            // TODO: need better code for human readable and performance
+            if (isset($_SERVER['DATABASE_URL'])) {
+                $dir = $this->projectDir . '/app';
+                $url = $_SERVER['DATABASE_URL'];
+                $rdbs = substr($url, 0, strpos($url, '://'));
+                $url = substr($url, strpos($url, '://') + 3);
+                $userpass = substr($url, 0, strpos($url, '@'));
+                $url = substr($url, strpos($url, '@') + 1);
+                $hostport = substr($url, 0, strpos($url, '/'));
+                $url = substr($url, strpos($url, '/') + 1);
+                $nameversion = substr($url, 0);
+                $userpass = explode(':', $userpass);
+                $hostport = explode(':', $hostport);
+                $nameversion = explode('?', $nameversion);     
+                try {
+                    $pdo = new \PDO($rdbs . ':host=' . $hostport[0] . (isset($hostport[1]) ? ';port=' . $hostport[1] : '') . ';dbname=' . $nameversion[0], $userpass[0], isset($userpass[1]) ? $userpass[1]: null);
+                    foreach($pdo->query('SELECT * from core_plugin ORDER BY priority ASC') as $row) {
+                        $this->plugins[$row['code']] = [
+                            'code' => $row['code'],
+                            'priority' => $row['priority'],
+                            'path' => $dir . '/' . $row['code']
                         ];
                     }
+                    $pdo = null;
+                } catch (\PDOException $e) {
+                    // TODO: monitor + log
                 }
             }
         }
