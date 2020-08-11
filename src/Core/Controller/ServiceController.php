@@ -4,6 +4,7 @@ namespace App\Core\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ServiceController extends AbstractController
 {
@@ -16,6 +17,11 @@ class ServiceController extends AbstractController
      * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
+
+    /**
+     * @var ValidatorInterface
+     */
+    protected $validator;
 
     /**
      * @required
@@ -36,6 +42,17 @@ class ServiceController extends AbstractController
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
+        return $this;
+    }
+
+    /**
+     * @required
+     * @param ValidatorInterface $validator
+     * @return $this
+     */
+    public function setValidator(ValidatorInterface $validator)
+    {
+        $this->validator = $validator;
         return $this;
     }
 }
