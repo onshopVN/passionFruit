@@ -2,21 +2,29 @@
 namespace App\Core\Repository;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use App\Core\Entity\Plugin;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Yaml\Yaml;
 
 class PluginRepository extends AbstractRepository
 {
-    protected $kernel;
+    /**
+     * @var ParameterBagInterface
+     */
+    protected $parameterBag;
 
+    /**
+     * @param ParameterBagInterface $parameterBag
+     * @param ManagerRegistry $managerRegistry
+     * @param string entityClass
+     */
     public function __construct(
-        KernelInterface $kernel,
+        ParameterBagInterface $parameterBag,
         ManagerRegistry $managerRegistry, 
         string $entityClass = ''
     ) {
         parent::__construct($managerRegistry, $entityClass);
-        $this->kernel = $kernel;
+        $this->parameterBag = $parameterBag;
     }
 
     /**
@@ -24,16 +32,51 @@ class PluginRepository extends AbstractRepository
      */
     public function applyWorkflow()
     {
-        if (method_exists($this->kernel, 'getPlugins')) {
-            $currentPlugins = $this->kernel->getPlugins();
-            foreach ($currentPlugins as $plugin) {
-                $this->filesystem->remove($plugin['path']);
+        $prjDir = $this->parameterBag->get('kernel.project_dir');
+
+        // disable 
+        $plugins = $this->findBy(['status' => Plugin::STATUS_DISABLE], ['priority' => 'ASC']);
+        foreach ($plugins as $plugin) {
+            $srcDir = $prjDir.'/src/'.$plugin->getCode();
+            $dstDir = $prjDir.'/app/'.$plugin->getCode();
+            if ($this->filesystem->exists($dstDir)) {
+                $this->filesystem->remove($dstDir);
+            }
+
+            // skeleton
+            $sktDir = $srcDir.'/Skeleton';
+            if ($this->filesystem->exists($sktDir)) {
+                $finder = Finder::create()->files()->in($sktDir);
+                if ($finder->hasResults()) {
+                    foreach ($finder as $f) {
+                        $targetFile = str_replace('src/'.$plugin->getCode(), 'app', $f->getRealPath());
+                        if ($this->filesystem->exists($targetFile)) {
+                            $this->filesystem->remove($targetFile);
+                        }
+                    }
+                }
             }
         }
 
-        $plugins = $this->findBy(['status' => Plugin::STATUS_ENABLE]);
+        // enable
+        $plugins = $this->findBy(['status' => Plugin::STATUS_ENABLE], ['priority' => 'ASC']);
         foreach ($plugins as $plugin) {
-            $this->filesystem->symlink($this->kernel->getProjectDir().'/src/'.$plugin->getCode(), $this->kernel->getProjectDir().'/app/'.$plugin->getCode());
+            $srcDir = $prjDir.'/src/'.$plugin->getCode();
+            $dstDir = $prjDir.'/app/'.$plugin->getCode();
+            if (!$this->filesystem->exists($dstDir)) {
+                $this->filesystem->symlink($srcDir, $dstDir);
+
+                // skeleton
+                $sktDir = $srcDir.'/Skeleton';
+                if ($this->filesystem->exists($sktDir)) {
+                    $finder = Finder::create()->files()->in($sktDir);
+                    if ($finder->hasResults()) {
+                        foreach ($finder as $f) {
+                            $this->filesystem->symlink($f->getRealPath(), str_replace('src/'.$plugin->getCode(), 'app', $f->getRealPath()));
+                        }
+                    }
+                }
+            }
         }
     }
 }
