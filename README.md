@@ -1,6 +1,7 @@
 # PassionFruit  
 
 ## Overview 
+A CMS need be clean, modular and easy to customize.
 
 ## Concepts
 - Skeleton contains Interface which defined CMS workflow. 
