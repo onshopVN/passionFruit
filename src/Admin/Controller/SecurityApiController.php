@@ -33,7 +33,7 @@ class SecurityApiController extends ServiceController
     }
 
     /**
-     * @Route("/admin/api/register", name="admin_register", methods="POST")
+     * @Route("/admin/api/register", name="admin_api_security_register", methods="POST")
      * @param Request $request
      * @return JsonResponse
      */
@@ -51,7 +51,6 @@ class SecurityApiController extends ServiceController
 
             $this->adminR->save($admin);
 
-            dump($this->authLoginR);die(__METHOD__);
 
             $response['success'] = 'Action success!';
         } catch (\Exception $e) {

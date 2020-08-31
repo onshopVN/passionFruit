@@ -1,6 +1,6 @@
 <?php
 namespace App\Skeleton\Repository;
 
-interface AuthLoginRI
+interface AuthLoginRI extends RepositoryInterface
 {
 }

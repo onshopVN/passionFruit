@@ -4,6 +4,9 @@ namespace App\Core\Repository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\Process\Process;
 use App\Core\Entity\Plugin;
 
 class PluginRepository extends AbstractRepository
@@ -14,17 +17,45 @@ class PluginRepository extends AbstractRepository
     protected $parameterBag;
 
     /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
      * @param ParameterBagInterface $parameterBag
      * @param ManagerRegistry $managerRegistry
      * @param string entityClass
      */
     public function __construct(
+        ContainerInterface $container,
         ParameterBagInterface $parameterBag,
         ManagerRegistry $managerRegistry, 
         string $entityClass = ''
     ) {
         parent::__construct($managerRegistry, $entityClass);
+        $this->container = $container;
         $this->parameterBag = $parameterBag;
+    }
+
+    /**
+     * Check required
+     * 
+     * @return bool
+     * @throws \LogicException
+     */
+    public function assertRequired(Plugin $plugin)
+    {
+        $required = $plugin->getRequired('serialize');
+        if ($required && is_array($required)) {
+            foreach ($required as $r) {
+                $process = new Process(['php', 'bin/console', 'debug:container', $r]);
+                $process->run();
+                if (!$process->isSuccessful()) {
+                    throw new \LogicException($r . 'need implemented before enable this plugin.');
+                }
+            }
+        }
+        return true;
     }
 
     /**

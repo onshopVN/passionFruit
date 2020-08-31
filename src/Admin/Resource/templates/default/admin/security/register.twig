@@ -1,10 +1,39 @@
 <html>
     <body>
-        <form>
-            <input type="text" placeholder="Fullname" />
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
-            <button type="submit">Submit</button>
-        </form>
+        <div id="app">
+            <form>
+                <input type="text" placeholder="Fullname" v-model="admin.fullname" />
+                <input type="email" placeholder="Email" v-model="admin.email" />
+                <input type="password" placeholder="Password" v-model="admin.password" />
+                <button type="submit" @click.stop.prevent="submit">Submit</button>
+            </form>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script>
+            const app = new Vue({
+                el: '#app',
+                data: {
+                    admin: {
+                        email: '',
+                        password: '',
+                        fullname: ''
+                    }
+                },
+                methods: {
+                    submit() {
+                        $.ajax({
+                            url: '{{url('admin_api_security_register')}}',
+                            method: 'POST',
+                            data: {
+                                admin: this.admin
+                            }
+                        }).done(() => {
+
+                        });
+                    }
+                }
+            });
+        </script>
     </body>
 </html>
