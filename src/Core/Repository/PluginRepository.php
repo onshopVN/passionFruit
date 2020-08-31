@@ -2,21 +2,60 @@
 namespace App\Core\Repository;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\Process\Process;
 use App\Core\Entity\Plugin;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Yaml\Yaml;
 
 class PluginRepository extends AbstractRepository
 {
-    protected $kernel;
+    /**
+     * @var ParameterBagInterface
+     */
+    protected $parameterBag;
 
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * @param ParameterBagInterface $parameterBag
+     * @param ManagerRegistry $managerRegistry
+     * @param string entityClass
+     */
     public function __construct(
-        KernelInterface $kernel,
+        ContainerInterface $container,
+        ParameterBagInterface $parameterBag,
         ManagerRegistry $managerRegistry, 
         string $entityClass = ''
     ) {
         parent::__construct($managerRegistry, $entityClass);
-        $this->kernel = $kernel;
+        $this->container = $container;
+        $this->parameterBag = $parameterBag;
+    }
+
+    /**
+     * Check required
+     * 
+     * @return bool
+     * @throws \LogicException
+     */
+    public function assertRequired(Plugin $plugin)
+    {
+        $required = $plugin->getRequired('serialize');
+        if ($required && is_array($required)) {
+            foreach ($required as $r) {
+                $process = new Process(['php', 'bin/console', 'debug:container', $r]);
+                $process->run();
+                if (!$process->isSuccessful()) {
+                    throw new \LogicException($r . 'need implemented before enable this plugin.');
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -24,16 +63,51 @@ class PluginRepository extends AbstractRepository
      */
     public function applyWorkflow()
     {
-        if (method_exists($this->kernel, 'getPlugins')) {
-            $currentPlugins = $this->kernel->getPlugins();
-            foreach ($currentPlugins as $plugin) {
-                $this->filesystem->remove($plugin['path']);
+        $prjDir = $this->parameterBag->get('kernel.project_dir');
+
+        // disable 
+        $plugins = $this->findBy(['status' => Plugin::STATUS_DISABLE], ['priority' => 'ASC']);
+        foreach ($plugins as $plugin) {
+            $srcDir = $prjDir.'/src/'.$plugin->getCode();
+            $dstDir = $prjDir.'/app/'.$plugin->getCode();
+            if ($this->filesystem->exists($dstDir)) {
+                $this->filesystem->remove($dstDir);
+            }
+
+            // skeleton
+            $sktDir = $srcDir.'/Skeleton';
+            if ($this->filesystem->exists($sktDir)) {
+                $finder = Finder::create()->files()->in($sktDir);
+                if ($finder->hasResults()) {
+                    foreach ($finder as $f) {
+                        $targetFile = str_replace('src/'.$plugin->getCode(), 'app', $f->getRealPath());
+                        if ($this->filesystem->exists($targetFile)) {
+                            $this->filesystem->remove($targetFile);
+                        }
+                    }
+                }
             }
         }
 
-        $plugins = $this->findBy(['status' => Plugin::STATUS_ENABLE]);
+        // enable
+        $plugins = $this->findBy(['status' => Plugin::STATUS_ENABLE], ['priority' => 'ASC']);
         foreach ($plugins as $plugin) {
-            $this->filesystem->symlink($this->kernel->getProjectDir().'/src/'.$plugin->getCode(), $this->kernel->getProjectDir().'/app/'.$plugin->getCode());
+            $srcDir = $prjDir.'/src/'.$plugin->getCode();
+            $dstDir = $prjDir.'/app/'.$plugin->getCode();
+            if (!$this->filesystem->exists($dstDir)) {
+                $this->filesystem->symlink($srcDir, $dstDir);
+
+                // skeleton
+                $sktDir = $srcDir.'/Skeleton';
+                if ($this->filesystem->exists($sktDir)) {
+                    $finder = Finder::create()->files()->in($sktDir);
+                    if ($finder->hasResults()) {
+                        foreach ($finder as $f) {
+                            $this->filesystem->symlink($f->getRealPath(), str_replace('src/'.$plugin->getCode(), 'app', $f->getRealPath()));
+                        }
+                    }
+                }
+            }
         }
     }
 }

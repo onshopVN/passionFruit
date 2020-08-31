@@ -51,6 +51,13 @@ class Plugin
     private $status = self::STATUS_DISABLE;
 
     /**
+     * Require skeleton in json format
+     * @ORM\Column(type="string", length=1000,nullable=false, options={"default":"[]"})
+     * @var string 
+     */
+    private $required = '[]';
+
+    /**
      * @ORM\Column(type="datetime", nullable=false)
      * @var \DateTime
      */
@@ -239,4 +246,27 @@ class Plugin
     {
         return $this->getStatus() == self::STATUS_DISABLE;
     }
+
+    /**
+     * Get $required
+     * @return string|array 
+     */
+    public function getRequired(string $format = 'raw')
+    {
+        if ($format === 'serialize') {
+            return json_decode($this->required);
+        }
+        return $this->required;
+    }
+
+    /**
+     * Set $required
+     * @param string $required
+     * @return $this 
+     */
+    public function setRequired(string $required) : self 
+    {
+        $this->required = $required;
+        return $this;
+    }    
 }

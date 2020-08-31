@@ -1,0 +1,15 @@
+{
+    "name": "admin",
+    "version": "1.0.0",
+    "description": "Implement admin",
+    "type": "IQ-plugin",
+    "extra": {
+      "code": "Admin",
+      "priority": 30
+    },
+    "require": {
+      "skeleton": [
+        "App\\Skeleton\\Repository\\AuthLoginRI"
+      ]
+    }
+  }

@@ -85,14 +85,14 @@ class PluginInstallCommand extends Command
             $output->writeln('The '.$code.' has already installed');
             return Command::FAILURE;
         }
-
         $plugin = $this->pluginR->newEntity();
         $plugin = $this->pluginR->copyValues($plugin, [
             'name' => $metadata['name'],
             'description' => $metadata['description'],
             'code' => $metadata['extra']['code'],
             'priority' => $metadata['extra']['priority'],
-            'status' => Plugin::STATUS_DISABLE
+            'status' => Plugin::STATUS_DISABLE,
+            'required' => isset($metadata['require']['skeleton']) ? json_encode($metadata['require']['skeleton']) : json_encode([])
         ]);
         $this->pluginR->save($plugin);
 

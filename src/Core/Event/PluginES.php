@@ -41,6 +41,7 @@ class PluginES implements EventSubscriberInterface
             /** @var Plugin $plugin */
             $plugin = $event->getEntity();
             if ($plugin->isEnable()) {
+                $this->pluginR->assertRequired($plugin);
                 $this->pluginR->applyWorkflow();
             }
             if ($plugin->isDisable()) {

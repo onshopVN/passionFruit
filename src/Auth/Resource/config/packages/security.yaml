@@ -1,0 +1,16 @@
+security:
+    encoders:
+        App\Auth\Entity\Login:
+            algorithm: argon2i
+    providers:
+        auth_login_provider:
+            entity: 
+                class: App\Auth\Entity\Login
+                property: email
+    firewalls:
+        main:
+            guard:
+                provider: auth_login_provider
+                authenticators: 
+                    - App\Auth\Service\Security\FormLoginAuthenticator
+
